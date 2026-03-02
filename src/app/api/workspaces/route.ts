@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/utils'
 
 export async function POST(request: Request) {
+  // Use the regular client to get the authenticated user from cookies
   const supabase = await createClient()
 
   const {
@@ -20,8 +21,11 @@ export async function POST(request: Request) {
 
   const slug = slugify(name.trim())
 
+  // Use the service-role client for DB writes (bypasses RLS)
+  const admin = await createServiceClient()
+
   // Insert workspace
-  const { data: workspace, error: wsError } = await supabase
+  const { data: workspace, error: wsError } = await admin
     .from('workspaces')
     .insert({ name: name.trim(), slug })
     .select()
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   // Insert owner membership
-  const { error: memberError } = await supabase
+  const { error: memberError } = await admin
     .from('workspace_members')
     .insert({ workspace_id: workspace.id, user_id: user.id, role: 'owner' })
 
