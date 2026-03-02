@@ -3,7 +3,8 @@ import OpenAI from 'openai'
 import { createClient } from '@/lib/supabase/server'
 import type { AIGenerationRequest, Platform } from '@/types'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+// Lazy instantiation — avoids build-time failure when env var isn't set
+const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const PLATFORM_GUIDES: Record<Platform, string> = {
   instagram: 'Instagram: visual storytelling, emoji-friendly, 2200 char max, strong hashtag culture, first line must hook instantly',
@@ -52,7 +53,7 @@ Return a JSON object with:
   "suggested_posting_time": "best time suggestion as a string"
 }`
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
