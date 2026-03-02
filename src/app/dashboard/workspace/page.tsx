@@ -32,8 +32,7 @@ function WorkspacePageContent() {
       setNewName('')
       setShowNewForm(false)
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message ?? String(err)
-      console.error('[workspace create]', err)
+      const msg = err instanceof Error ? err.message : String(err)
       toast.error(`Failed to create workspace: ${msg}`)
     }
   }
