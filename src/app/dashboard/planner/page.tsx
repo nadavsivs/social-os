@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { usePosts } from '@/hooks/use-posts'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,11 @@ export default function PlannerPage() {
   const { data: posts = [] } = usePosts(currentWorkspace?.id)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(currentDate)
@@ -42,6 +47,18 @@ export default function PlannerPage() {
   }
 
   const selectedDayPosts = selectedDay ? getPostsForDay(selectedDay) : []
+
+  if (!mounted) {
+    return (
+      <div className="p-8 max-w-5xl mx-auto">
+        <div className="mb-8">
+          <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-2" />
+          <div className="h-4 w-64 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+        </div>
+        <div className="h-[500px] animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
