@@ -44,13 +44,19 @@ export function useCreateWorkspace() {
         .select()
         .single()
 
-      if (wsError) throw wsError
+      if (wsError) {
+        console.error('[createWorkspace] workspace insert error:', JSON.stringify(wsError))
+        throw new Error(`Workspace insert failed: ${wsError.message} (code: ${wsError.code})`)
+      }
 
       const { error: memberError } = await supabase
         .from('workspace_members')
         .insert({ workspace_id: (workspace as Workspace).id, user_id: user.id, role: 'owner' as const })
 
-      if (memberError) throw memberError
+      if (memberError) {
+        console.error('[createWorkspace] member insert error:', JSON.stringify(memberError))
+        throw new Error(`Member insert failed: ${memberError.message} (code: ${memberError.code})`)
+      }
 
       return workspace as Workspace
     },
