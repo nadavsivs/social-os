@@ -26,7 +26,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (!workspaces.length || !currentWorkspace) {
+  if (!currentWorkspace) {
     return <WorkspaceSetup />
   }
 

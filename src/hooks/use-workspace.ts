@@ -1,26 +1,16 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { createClient } from '@/lib/supabase/client'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { Workspace } from '@/types'
 
 export function useWorkspaces() {
-  const supabase = createClient()
-
   return useQuery({
     queryKey: ['workspaces'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('workspaces')
-        .select(`
-          *,
-          workspace_members!inner(role)
-        `)
-        .order('created_at', { ascending: true })
-
-      if (error) throw error
-      return data as (Workspace & { workspace_members: { role: string }[] })[]
+      const res = await fetch('/api/workspaces')
+      if (!res.ok) return []
+      return res.json() as Promise<(Workspace & { workspace_members: { role: string }[] })[]>
     },
   })
 }
